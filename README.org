@@ -1,0 +1,94 @@
+* calctape
+
+Emacs adding-machine, tape calculator, column sum-mer
+
+Here's an animated GIF screencast (Refresh the webpage to restart it).
+
+[[file:./calctape_demo.gif]]
+
+** Commentary:
+
+At the time of this writing, the closest thing that Emacs had to
+tape calculator functionality is the =calc= "trail" window (see
+variable =calc-display-trail=), with all its oddities, benefits,
+and drawbacks. Other methods required either: 1) selecting a
+rectangle of numbers and sending it to =calc= for that package to
+use internally in its own dedicated buffer; 2) transforming a
+rectangle of numbers (and possibly their annotations) into an
+=org-mode= table and having that package handle it.
+
+This package provides an easy-to-use tape calculator functionality
+natively and intuitively IN ANY BUFFER. You can use it to sum an
+existing column of numbers, without even having to select the
+entire region, and even if the numbers are badly aligned. You can
+use it to create a "tape" in any writable buffer, and can include
+annotations for each line. It auto-aligns its tapes, supports
+memory operations, can perform VAT / sales tax calculations, and
+seamlessly handles integers, floats, and scientific notation on the
+same tape.
+
+** Operation:
+
+This pacakge provides five interactive functions (and doesn't
+require any major or minor modes!).
+
+Use =M-x calctape-sum= to operate on a pre-existing column of raw
+numbers that are not formatted as a tape. Just place POINT anywhere
+in or near the column and let =er rip. I=m using the term "column"
+loosely in this context. The function should operate even if the
+column is very badly aligned. The result should be a formatted tape
+in-situ.
+
+Use =M-x calctape-create= to create a tape from scratch. Place
+POINT wherever you want the tape to display, and run the command.
+For each line of the tape, you will be prompted for a value and a
+description. Pressing ENTER for a value will end the tape. For all
+the details, and for the mathematical and memory operations
+supported, see the function's  docstring.
+
+Use =M-x calctape-delete= to remove one or more lines from an
+existing tape. To delete a single line, place POINT on that line
+before running the command. To delete N lines from POINT, either
+specify a PREFIX-ARG or select a REGION that includes part of those
+lines.
+
+Use =M-x calctape-edit= to edit the tape at POINT. The function will
+prompt you for data to insert into the tape prior to the line at
+POINT and update the entire tape after each line of insertion. Note
+that for this function, the prompt will indicate the current sum at
+POINT.
+
+Use =M-x calctape-strip-box= to remove from the tape around POINT
+the unicode line-drawing characters that by default frame a tape.
+You can change that default behaviour by toggling the BOOLEAN
+customization variable =calctape-box= and you can modify the
+characters used by altering customization variable
+=calctape-box-chars=.
+
+Users of Emacs =quick-calc= can use interactive wrapper function
+=calctape-qc= to perform =quick-calc= operations and get the output
+formatted with thousands delimiters.
+
+** Configuration
+
+See =M-x customize-group <RET> calctape=.
+
+** Feedback:
+
+It's  best to contact me by opening an 'issue' on the package's  github
+repository (see above) or, distant second-best, by direct e-mail.
+
+Code contributions are welcome and github starring is appreciated.
+
+** Compatibility
+
+This package has been tested under debian linux Emacs version 30. My
+guess is that it ought to work on ancient Emacsen; if you try it,
+please let me know.
+
+** Colophon
+
++ Copyright ©2025 Boruch Baum <boruch_baum@gmx.com>
++ Author:   Boruch Baum <boruch_baum@gmx.com>
++ Homepage: https://github.com/Boruch-Baum/emacs-calctape
++ SPDX-License-Identifier: GPL-3.0-or-later
