@@ -50,15 +50,6 @@
 ;; As a sneaky bonus, a wrapper function to Emacs `quick-calc' is
 ;; provided for outputting numbers with thousands delimiters.
 
-;; TODO: Currency signs?
-;; TODO: Numbers in parentheses as negative numbers?
-;; TODO: Different bases (binary, octal, hexadecimal)?
-;; TODO: Rounding and significant digits?
-;; TODO: Force sums to scientific notation?
-;;       eg. (format "%.6e" (string-to-number (calc-eval "2^50")))
-;; TODO: Undo last action?
-
-
 ;;
 ;;; Dependencies (already part of Emacs):
 ;;
@@ -135,6 +126,17 @@
 ;; My guess is that it ought to work on ancient Emacsen; if you try
 ;; it, please let me know.
 
+;;
+;;; TODOs
+;;
+;; TODO: Currency signs?
+;; TODO: Numbers in parentheses as negative numbers?
+;; TODO: Different bases (binary, octal, hexadecimal)?
+;; TODO: Rounding and significant digits?
+;; TODO: Force sums to scientific notation?
+;;       eg. (format "%.6e" (string-to-number (calc-eval "2^50")))
+;; TODO: Undo last action?
+
 
 ;;
 ;;; Code:
@@ -149,11 +151,11 @@
 
 (defconst calctape--operator-regex "\\(\\([-+\\*/=T]\\)\\|\\(%[-+/\\*]?\\)\\)?"
   "Mathematical operators meant to be input post-fix valid number values.
-In addition to `+', `-', `*', `/', there several percentage operators
-that operate on the current sub-total SUM: `%' or `%+' adds a percentage
-of SUM to SUM, '%-' subtracts a percentage of SUM from SUM, and `%*'
-multiplies SUM by a percentage. The tax operator `T' is equivalent to
-performing `%+' using the value stored in configuration variable
+In addition to '+', '-', '*', '/', there several percentage operators
+that operate on the current sub-total SUM: '%' or '%+' adds a percentage
+of SUM to SUM, '%-' subtracts a percentage of SUM from SUM, and '%*'
+multiplies SUM by a percentage. The tax operator 'T' is equivalent to
+performing '%+' using the value stored in configuration variable
 `calctape-tax-rate'.")
 
 (defconst calctape--controls-regex  "\\([cC]\\)\\|\\([mM][cC]\\)\\|\\([mM][-+*/]?\\)\\|\\([mM][rR][-+]?\\)\\|\\([mM][sS]\\)\\|\\([tT]\\)"
@@ -566,7 +568,7 @@ NUM must match regex `calctape--full-num-regex'."
           (if (< calctape-desc-dist
                 (setq blank-len (length (or (match-string 2) ""))))
             (goto-char (+ (match-beginning 2) calctape-desc-dist))
-           (goto-char (line-end-position))
+           (end-of-line)
            (insert-char #x20 (- calctape-desc-dist blank-len))))
         (t (user-error error-msg "2")))))
     (goto-char start-pos)))
@@ -687,6 +689,7 @@ from interactive function `calctape-create' or `calctape-edit'."
         (-horz (cadr calctape-box-chars))
         (-corn (cddr calctape-box-chars))
         leftmost-column
+        line-end-column
         line-width
         start-point-marker ; where to return when finished
         first-line-of-tape
@@ -740,11 +743,12 @@ from interactive function `calctape-create' or `calctape-edit'."
     (goto-char upper-left-pos)
     ;; top box line
     (forward-line -1)
-    (setq line-end-column (progn (goto-char (line-end-position)) (current-column)))
+    (setq line-end-column (progn (end-of-line)
+                                 (current-column)))
     (forward-line 0)
     (cond
      ((< line-end-column leftmost-column)
-       (goto-char (line-end-position))
+       (end-of-line)
        (insert-char #x20 (- leftmost-column line-end-column)))
      (t ; top box line may have non-blank characters where we want to box
        (forward-char leftmost-column)
@@ -757,7 +761,7 @@ from interactive function `calctape-create' or `calctape-edit'."
         ((match-beginning 2) ; There is a non-blank char on the line
           (if (>= (- (match-beginning 2) (point)) line-width)
             (delete-char (- line-width)) ; It is to right of table
-           (goto-char (line-end-position))
+           (end-of-line)
            (insert "\n")
            (insert-char #x20 leftmost-column)))
         ((match-beginning 1)
@@ -769,13 +773,14 @@ from interactive function `calctape-create' or `calctape-edit'."
       (forward-line)
       (forward-char leftmost-column)
       (insert (format "%s " -vert))
-      (setq line-end-column (progn (goto-char (line-end-position)) (current-column)))
+      (setq line-end-column (progn (end-of-line)
+                                   (current-column)))
       (cond
        ((< line-end-column rightmost-column)
-        (goto-char (line-end-position))
+        (end-of-line)
         (insert-char #x20 (- rightmost-column line-end-column)))
        (t
-        (goto-char (line-beginning-position))
+        (beginning-of-line)
         (forward-char rightmost-column)
         (when (looking-at "  ")
           (delete-char 2))))
@@ -791,10 +796,11 @@ from interactive function `calctape-create' or `calctape-edit'."
        (insert-char #x20 leftmost-column))
      (t
       (forward-line)
-      (setq line-end-column (progn (goto-char (line-end-position)) (current-column)))
+      (setq line-end-column (progn (end-of-line)
+                                   (current-column)))
       (cond
        ((< line-end-column leftmost-column)
-        (goto-char (line-end-position))
+        (end-of-line)
         (insert-char #x20 (- leftmost-column line-end-column)))
        (t
         (goto-char (line-beginning-position))
@@ -974,7 +980,7 @@ the tape, including the decimal point and any scientific notation."
 
 
 (defun calctape--print-total-for-clear (min-col max-len)
-  "For user control operator `C' (clear).
+  "For user control operator 'C' (clear).
 
 MIN-COL is the column to find a tape line's mathematical or control
 operator symbol.
@@ -1240,7 +1246,7 @@ This function returns a list (needed only when called directly by
     (setq begin-rect (+ (line-beginning-position)
                         begin-column))
     (goto-char editing-sum-mark)
-    (goto-char (line-end-position))
+    (end-of-line)
     (when (< (current-column) end-column)
       (insert-char #x20 (- end-column (current-column))))
     (setq end-rect (+ (line-beginning-position)
@@ -1287,7 +1293,8 @@ integer. It is ignored when OP-TODO is `edit'."
          max-len
          max-int-len
          max-desc-len
-         editing-sum-mark)
+         editing-sum-mark
+         return-list)
     (save-mark-and-excursion
       ;; Validate current line of tape and strip box
       (unless
@@ -1765,7 +1772,7 @@ does not support scientific notation."
       (user-error "calctape: No tape found!"))
     (when (= max-buf-line temp-line)
       (cl-incf temp-line)
-      (goto-char (line-end-position))
+      (end-of-line)
       (insert "\n"))
     (setq number-of-lines (- temp-line (line-number-at-pos top-pos) -1))
     (setq max-int-len (nth 2 sum-struct))
@@ -1780,7 +1787,7 @@ does not support scientific notation."
            (forward-char min-col)
            (insert prefix))
           (t
-           (goto-char (line-end-position))
+           (end-of-line)
            (insert-char #x20 (- min-col (current-column)))
            (insert "\n")
            (backward-char (+ min-col 3)))))
