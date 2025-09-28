@@ -295,7 +295,10 @@ customization variable `calctape-box-chars' and internal functions
            (error "Value must be a single character")
           (set-default sym val))))
 
-(declare-function calctape--validate-symbols nil (_sym _val)) ; real defun below
+(defun calctape--validate-symbols (_sym _val) "" t) ; real defun below
+;; NOTE: Using `declare-function' (as below) causes `load-file' of this package to
+;; fail, although `eval-buffer' does work.
+;; (declare-function calctape--validate-symbols nil (_sym _val)) ; real defun below
 (defcustom calctape-symbols (cons "." ",")
   "Symbols to use for decimal points and thousands delimiters."
   :type '(cons (string :tag "Decimal point character")
