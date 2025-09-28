@@ -151,11 +151,11 @@
 
 (defconst calctape--operator-regex "\\(\\([-+\\*/=T]\\)\\|\\(%[-+/\\*]?\\)\\)?"
   "Mathematical operators meant to be input post-fix valid number values.
-In addition to '+', '-', '*', '/', there several percentage operators
-that operate on the current sub-total SUM: '%' or '%+' adds a percentage
-of SUM to SUM, '%-' subtracts a percentage of SUM from SUM, and '%*'
-multiplies SUM by a percentage. The tax operator 'T' is equivalent to
-performing '%+' using the value stored in configuration variable
+In addition to \='+\=', \='-\=', \='*\=', \='/\=', there several percentage operators
+that operate on the current sub-total SUM: \='%\=' or \='%+\=' adds a percentage
+of SUM to SUM, \='%-\=' subtracts a percentage of SUM from SUM, and \='%*\='
+multiplies SUM by a percentage. The tax operator \='T\=' is equivalent to
+performing \='%+\=' using the value stored in configuration variable
 `calctape-tax-rate'.")
 
 (defconst calctape--controls-regex  "\\([cC]\\)\\|\\([mM][cC]\\)\\|\\([mM][-+*/]?\\)\\|\\([mM][rR][-+]?\\)\\|\\([mM][sS]\\)\\|\\([tT]\\)"
@@ -295,7 +295,7 @@ customization variable `calctape-box-chars' and internal functions
            (error "Value must be a single character")
           (set-default sym val))))
 
-(defun calctape--validate-symbols (_sym _val) "" t) ; real defun below
+(declare-function calctape--validate-symbols nil (_sym _val)) ; real defun below
 (defcustom calctape-symbols (cons "." ",")
   "Symbols to use for decimal points and thousands delimiters."
   :type '(cons (string :tag "Decimal point character")
@@ -814,7 +814,8 @@ from interactive function `calctape-create' or `calctape-edit'."
          (insert-char #x20 leftmost-column)
          (insert "\n")
          (backward-char 1))))))
-    (insert (format "%s%s%s" (nth 2 -corn) horz-line (nth 3 -corn)))))
+    (insert (format "%s%s%s" (nth 2 -corn) horz-line (nth 3 -corn)))
+    (goto-char start-point-marker)))
 
 
 (defun calctape--get-description-len ()
@@ -863,7 +864,6 @@ they are behind `rectangle-previous-line'."
         nearest-num-distance
         current-num
         current-num-thou
-        current-num-begin-pos
         current-num-begin-column
         current-num-len
         current-num-end-column
@@ -879,7 +879,6 @@ they are behind `rectangle-previous-line'."
            (setq current-num
              (setq current-num-thou
                (match-string-no-properties 0)))
-           (setq current-num-begin-pos (match-beginning 0))
            (save-match-data
              (or (condition-case _err
                    (setq current-num (calctape--delimit-num-check current-num))
@@ -980,7 +979,7 @@ the tape, including the decimal point and any scientific notation."
 
 
 (defun calctape--print-total-for-clear (min-col max-len)
-  "For user control operator 'C' (clear).
+  "For user control operator \='C\=' (clear).
 
 MIN-COL is the column to find a tape line's mathematical or control
 operator symbol.
@@ -1441,7 +1440,6 @@ ie. the tape grand total."
        thou-value     ; value, with thousands delimiters, unsafe for `calc-eval'
        thou-value-todo
        (thou-tax (calc-eval (format "(%s * 100)" (car calctape-tax-rate))))
-       thou-len
        thou-int-len
        thou-dec-len
        operator       ; + - * / % T = see 'calctape--operator-regex'
@@ -1594,7 +1592,7 @@ ie. the tape grand total."
                  (setq thou-dec-len
                    (+ (length (or (match-string 2 thou-value) ""))
                       (length (or (match-string 3 thou-value) ""))))))
-          (setq max-len (max max-len (setq thou-len (length thou-value)))))
+          (setq max-len (max max-len (length thou-value))))
         (when (and operator
                    (string-match "%" operator))
           (setq operator (replace-match "" nil nil operator))
