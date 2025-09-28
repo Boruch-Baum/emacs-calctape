@@ -803,14 +803,14 @@ from interactive function `calctape-create' or `calctape-edit'."
         (end-of-line)
         (insert-char #x20 (- leftmost-column line-end-column)))
        (t
-        (goto-char (line-beginning-position))
+        (beginning-of-line)
         (forward-char leftmost-column)
         (if (not (re-search-forward
                    "[^[:blank:]]"
                    (min (+ (point) line-width) (line-end-position))
                    t))
           (delete-char (min line-width (- (line-end-position) (point))))
-         (goto-char (line-beginning-position))
+         (beginning-of-line)
          (insert-char #x20 leftmost-column)
          (insert "\n")
          (backward-char 1))))))
@@ -870,7 +870,7 @@ they are behind `rectangle-previous-line'."
         current-num-distance
         description-len
         numbers-found) ; (list '(num-string begin-column end-column))
-    (goto-char (line-beginning-position))
+    (beginning-of-line)
     (while
       (and (re-search-forward (calctape--full-num-regex-SLACK)
                               (line-end-position)
@@ -935,7 +935,7 @@ operator symbol."
          (string-match "[^[:blank:]]"
            (buffer-substring (+ (line-beginning-position) min-col)
                                 (line-end-position))))
-     (goto-char (line-beginning-position))
+     (beginning-of-line)
      (insert "\n")
      (forward-line -1))))
 
@@ -1230,12 +1230,12 @@ This function returns a list (needed only when called directly by
     (setq begin-target (+ (line-beginning-position)
                       begin-column))
     (unless number-of-lines-to-delete
-      (error "calctape--edit 'delete: number-of-lines-to-delete is NIL"))
+      (error "Calctape--delete: number-of-lines-to-delete is NIL"))
     (unless (< 0 (- (line-number-at-pos editing-sum-mark)
                     (line-number-at-pos)
                     number-of-lines-to-delete))
       (user-error
-        "calctape--edit 'delete: number-of-lines-to-delete exceeds size of tape.?"))
+        "Calctape--delete: number-of-lines-to-delete exceeds size of tape.?"))
     (forward-line (1- number-of-lines-to-delete))
     (delete-rectangle begin-target
                       (min (line-end-position)
