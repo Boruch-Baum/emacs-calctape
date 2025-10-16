@@ -151,12 +151,12 @@
 
 (defconst calctape--operator-regex "\\(\\([-+\\*/=T]\\)\\|\\(%[-+/\\*]?\\)\\)?"
   "Mathematical operators meant to be input post-fix valid number values.
-In addition to \='+\=', \='-\=', \='*\=', \='/\=', there several percentage operators
-that operate on the current sub-total SUM: \='%\=' or \='%+\=' adds a percentage
-of SUM to SUM, \='%-\=' subtracts a percentage of SUM from SUM, and \='%*\='
-multiplies SUM by a percentage. The tax operator \='T\=' is equivalent to
-performing \='%+\=' using the value stored in configuration variable
-`calctape-tax-rate'.")
+In addition to \='+\=', \='-\=', \='*\=', \='/\=', there several
+percentage operators that operate on the current sub-total SUM: \='%\='
+or \='%+\=' adds a percentage of SUM to SUM, \='%-\=' subtracts a
+percentage of SUM from SUM, and \='%*\='multiplies SUM by a percentage.
+The tax operator \='T\=' is equivalent to performing \='%+\=' using the
+value stored in configuration variable `calctape-tax-rate'.")
 
 (defconst calctape--controls-regex  "\\([cC]\\)\\|\\([mM][cC]\\)\\|\\([mM][-+*/]?\\)\\|\\([mM][rR][-+]?\\)\\|\\([mM][sS]\\)\\|\\([tT]\\)"
   "Control operation strings available in lieu of valid number values.
@@ -295,17 +295,14 @@ customization variable `calctape-box-chars' and internal functions
            (error "Value must be a single character")
           (set-default sym val))))
 
-(defun calctape--validate-symbols (_sym _val) "" t) ; real defun below
-;; NOTE: Using `declare-function' (as below) causes `load-file' of this package to
-;; fail, although `eval-buffer' does work.
-;; (declare-function calctape--validate-symbols nil (_sym _val)) ; real defun below
-(defcustom calctape-symbols (cons "." ",")
-  "Symbols to use for decimal points and thousands delimiters."
-  :type '(cons (string :tag "Decimal point character")
-               (string :tag "Thousands delimiter character"))
-  :set (lambda (sym val)
-         (and (calctape--validate-symbols sym val)
-            (set-default sym val))))
+;; MELPA compliance: moved below, after defun `calctape--validate-symbols'
+;; (defcustom calctape-symbols (cons "." ",")
+;;   "Symbols to use for decimal points and thousands delimiters."
+;;   :type '(cons (string :tag "Decimal point character")
+;;                (string :tag "Thousands delimiter character"))
+;;   :set (lambda (sym val)
+;;          (and (calctape--validate-symbols sym val)
+;;             (set-default sym val))))
 
 (defgroup calctape-description nil
   "Default description format strings for tape operations."
@@ -396,6 +393,16 @@ success."
   (when (/= 1 (length (cdr val)))
     (error "Thousands delimiter symbol must be a single character"))
   val)
+
+;; ==== BEGIN: Intentionally out of place (MELPA comlpiance)
+(defcustom calctape-symbols (cons "." ",")
+  "Symbols to use for decimal points and thousands delimiters."
+  :type '(cons (string :tag "Decimal point character")
+               (string :tag "Thousands delimiter character"))
+  :set (lambda (sym val)
+         (and (calctape--validate-symbols sym val)
+            (set-default sym val))))
+;; ==== END: Intentionally out of place (MELPA comlpiance)
 
 (defun calctape--full-num-regex-SLACK ()
   "Return a full number REGEX with thousands delimiters.
