@@ -1,3 +1,7 @@
+[[https://melpa.org/#/calctape][file:https://melpa.org/packages/calctape-badge.svg]][[https://stable.melpa.org/#/calctape][file:https://stable.melpa.org/packages/calctape-badge.svg]]
+
+
+
 * calctape
 
 Emacs adding-machine, tape calculator, column sum-mer
