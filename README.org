@@ -1,4 +1,4 @@
-[[https://melpa.org/#/calctape](https://melpa.org/#/calctape)[https://melpa.org/packages/calctape-badge.svg](https://melpa.org/packages/calctape-badge.svg)]
+[[https://melpa.org/packages/calctape-badge.svg](https://melpa.org/packages/calctape-badge.svg)[https://melpa.org/#/calctape](https://melpa.org/#/calctape)]
 
 * calctape
 
